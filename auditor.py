@@ -82,12 +82,23 @@ targetServerNamelabelstring.set("Target Server (usually authoritative)")
 targetServerNamelabel = Label(middle1frame, textvariable=targetServerNamelabelstring)
 targetServerNamelabel.pack(side = LEFT)
 
+#############################################################
+#Add a fucking Scrollbar
+scrollbar = Scrollbar(bottomframe1)
+scrollbar.pack(side=RIGHT, fill=Y)
+
+
 ##############################################################
 #initialize results pane for WHOIS
 
 #initialize a variable to hold the textbox entry
 whoisResults = Text(bottomframe1)
-whoisResults.pack(side=BOTTOM)
+whoisResults.pack(side=LEFT)
+
+##############################################################
+#bind scrollbar to things
+scrollbar.configure(command=whoisResults.yview)
+
 
 #looks up with whois the things in the textbox upon clicking the button
 
