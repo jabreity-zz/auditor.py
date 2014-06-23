@@ -1,98 +1,150 @@
 import Tkinter
 import string
 import subprocess
+import time
 from Tkinter import *
-from subprocess import call
-from collections import defaultdict
+#from subprocess import call
+#from collections import defaultdict
 
-
-
-#Requires whois by Mark Russinovich:
+            #Requires whois by Mark Russinovich:
 #http://technet.microsoft.com/en-us/sysinternals/bb897435.aspx
 
 #using the documentation from:
 #http://www.tutorialspoint.com/python/python_gui_programming.htm
+
 #########################################################
 #begin window layout
 
 
-#initialize a Tk window
+#initialize a Tk window, in this case our root window
 main = Tkinter.Tk()
 frame = Frame(main)
 frame.pack()
 
-middleframe = Frame(main)
-middleframe.pack(side=TOP)
+#Define a frame for the Reference server name/ip
+referenceserverframe = Frame(main)
+referenceserverframe.pack(side=TOP)
 
-middle1frame = Frame(main)
-middle1frame.pack(side=TOP)
+#Define a frame for the Target server name/ip
+targetserverframe = Frame(main)
+targetserverframe.pack(side=TOP)
 
-bottomframe = Frame(main)
-bottomframe.pack(side=LEFT)
+#Define a frame for the Open File/Path
+openfileframe = Frame(main)
+openfileframe.pack(side=TOP)
 
-bottomframe1 = Frame(main)
-bottomframe1.pack(side=LEFT)
+#Define a frame for the Open File/Path
+savefileframe = Frame(main)
+savefileframe.pack(side=TOP)
+
+#Define a frame for the results of nslookup on the left side of the window
+nslookupframe = Frame(main)
+nslookupframe.pack(side=LEFT)
+
+#Define a frame for the results of whois on the right side of the window
+whoisframe = Frame(main)
+whoisframe.pack(side=LEFT)
 
 ##########################################################
-#initialize a host entry box, label, and action button
+#initialize a host entry box, label
 
 #initialize a variable to hold the textbox entry
 hostName = StringVar()
 #Generates a field for the entry of ip address/addresses
 hostNameField = Entry(frame, textvariable=hostName)
 #generate a geometric box around your object and place it
-hostNameField.pack(side = LEFT)
+hostNameField.pack(side=LEFT)
 
+#create a label to the left of the host entry box
 hostNamelabelstring = StringVar()
 hostNamelabelstring.set("Hostname or single IP")
 hostNamelabel = Label(frame, textvariable=hostNamelabelstring)
-hostNamelabel.pack(side = LEFT)
+hostNamelabel.pack(side=LEFT)
 
 ############################################################
-#initialize a host entry box, label, and action button
+#initalize a open file path input box, label
+
+#initialize a variable to hold the textbox entry
+openFilePath = StringVar()
+#initialize things
+openFilePath.set("c:/util/hosts.txt")
+#generates a field for the entry of filename/path
+openFilePathField = Entry(openfileframe, textvariable=openFilePath, width=55)
+#generate a geometric box around your object and place it
+openFilePathField.pack(side=LEFT)
+
+#create a label to the left of the host entry box
+openFileLabelString = StringVar()
+openFileLabelString.set("Enter an import filename")
+openFileLabel = Label(openfileframe, textvariable=openFileLabelString)
+openFileLabel.pack(side=LEFT)
+
+###########################################################
+#initialize a save file path input box, label
+
+#initialize a variable to hold the textbox entry
+saveFilePath = StringVar()
+#initialize things
+saveFilePath.set("c:/util/hostResults.txt")
+#generates a filed for the entry of filename/path
+saveFilePathField = Entry(savefileframe, textvariable=saveFilePath, width=55)
+#generate a geometric box around your object and place it
+saveFilePathField.pack(side=LEFT)
+
+#create a label to the left of the save file path entry box
+saveFileLabelString = StringVar()
+saveFileLabelString.set("Enter a save filename")
+saveFileLabel = Label(savefileframe, textvariable=saveFileLabelString)
+saveFileLabel.pack(side=LEFT)
+
+############################################################
+#initialize a host entry box, label
 
 #initialize a variable to hold the textbox entry
 referenceServerName = StringVar()
 #initialize things
 referenceServerName.set("208.72.105.3")
 #Generates a field for the entry of ip address/addresses
-referenceServerNameField = Entry(middleframe, textvariable=referenceServerName)
+referenceServerNameField = Entry(referenceserverframe, textvariable=referenceServerName)
 #generate a geometric box around your object and place it
-referenceServerNameField.pack(side = LEFT)
+referenceServerNameField.pack(side=LEFT)
 
+#Create a label to the left of the host entry box
 referenceServerNamelabelstring = StringVar()
 referenceServerNamelabelstring.set("Reference Server (always recursive)")
-referenceServerNamelabel = Label(middleframe, textvariable=referenceServerNamelabelstring)
-referenceServerNamelabel.pack(side = LEFT)
+referenceServerNamelabel = Label(referenceserverframe, textvariable=referenceServerNamelabelstring)
+referenceServerNamelabel.pack(side=LEFT)
 
 ############################################################
-#initialize a host entry box, label, and action button
+#initialize a host entry box, label
 
 #initialize a variable to hold the textbox entry
 targetServerName = StringVar()
 #initialize things
 targetServerName.set("ns.ori.net")
 #Generates a field for the entry of ip address/addresses
-targetServerNameField = Entry(middle1frame, textvariable=targetServerName)
+targetServerNameField = Entry(targetserverframe, textvariable=targetServerName)
 #generate a geometric box around your object and place it
-targetServerNameField.pack(side = LEFT)
+targetServerNameField.pack(side=LEFT)
 
+#create a label to the left of the host entry box
 targetServerNamelabelstring = StringVar()
 targetServerNamelabelstring.set("Target Server (usually authoritative)")
-targetServerNamelabel = Label(middle1frame, textvariable=targetServerNamelabelstring)
-targetServerNamelabel.pack(side = LEFT)
+targetServerNamelabel = Label(targetserverframe, textvariable=targetServerNamelabelstring)
+targetServerNamelabel.pack(side=LEFT)
 
 #############################################################
 #Add a fucking Scrollbar
-scrollbar = Scrollbar(bottomframe1)
+scrollbar = Scrollbar(whoisframe)
 scrollbar.pack(side=RIGHT, fill=Y)
 
 
 ##############################################################
 #initialize results pane for WHOIS
 
-#initialize a variable to hold the textbox entry
-whoisResults = Text(bottomframe1)
+#initialize a variable to hold the textbox entry, and bind the length of the scrollbar
+#to the length of the whois results frame
+whoisResults = Text(whoisframe, yscrollcommand=scrollbar.set)
 whoisResults.pack(side=LEFT)
 
 ##############################################################
@@ -100,49 +152,100 @@ whoisResults.pack(side=LEFT)
 scrollbar.configure(command=whoisResults.yview)
 
 
-#looks up with whois the things in the textbox upon clicking the button
+#################################################################################
+#Define a function to load the contents of a file by iterating over each line filling a list
+
+
+def loadhosts():
+    hostlist = []
+    with open(openFilePath.get(), 'r', 0) as f:
+        for line in f:
+            hostlist.append(line)
+    f.close()
+    return hostlist
 
 ################################################################################
-#TODO: Rewrite this function, it's got a nasty implementation, where it only displays
-#the last ping task result.  *sigh* only so much time in the day.
+#Define a function to write the results of a process to a file line by line
+
+
+def savewhoisresults():
+    results = lookupwhoiesults()
+    with open(str(saveFilePath.get()), 'w') as afile:
+        for item in results:
+            afile.write(str(item))
+#################################################################################
+#Define a function to load the contents of a file one line at a time into the results screen
+
+
+def showhosts():
+    whoisResults.delete("1.0", END)
+    a = loadhosts()
+    for i in a:
+        whoisResults.insert(INSERT, i)
+
+
+################################################################################
+#The following function will preform the actions specified by checkHost,
+#looks up with whois the things in the textbox upon clicking the button.
+#Then, we declare the button
+################################################################################
+#Thought about rewriting this function, as it only displays
+#the last task result. Instead I added batch import/output functionality
+#At this point I decided the main gui is for one-off functionality
 ################################################################################
 
+#Define the nslookup commands to use against the host entered in the host txt field
 
-def checkHost(serverName):
-    #print hostNameEnum(hostName.get())
-    #a = hostNameEnum()
-    #for i in a:
-    #    print i
-    a = hostNameEnum()
+
+def checkhost(servername):
+    a = HostNameEnum()
     
     for i in a:
         #print(check(str(i)))
-        results = str(check(str(i), serverName))
+        results = str(Check(str(i), servername))
         if str(resultslabelstring.get()) == "empty":
             resultslabelstring.set(results)
         else:
             resultslabelstring.set(resultslabelstring.get() + results)
 
-def compareHost():
+#Define the action for the button, including calling checkHost doing an nslookup,
+#and load whois into the scroll textbox at the right.
+
+
+def comparehost():
     resultslabelstring.set("empty")
-    checkHost(str(referenceServerName.get()))
-    checkHost(str(targetServerName.get()))
+    checkhost(str(referenceServerName.get()))
+    checkhost(str(targetServerName.get()))
     #add the whois function call
     #whoisResults.insert(
     #print(whois(str(hostName.get())))
     whoisResults.delete("1.0", END)
-    whoisResults.insert(INSERT, (whois(str(hostName.get()))))
+    whoisResults.insert(INSERT, (Whois(str(hostName.get()))))
 #call compareHost on button click
 #object = Widget(Windoname, text=window title, command=function to call, optional things)
-hostNameCheck = Button(frame, text='check', command=compareHost)
+
+#Declare a button, and give it as "command=blah" the function name you wish to call
+hostNameCheck = Button(frame, text='check', command=comparehost)
 
 #generate a geometric box around your object and place it
-hostNameCheck.pack(side = TOP)
+hostNameCheck.pack(side=TOP)
 
+#Declare a new label for the results
 resultslabelstring = StringVar()
 resultslabelstring.set("empty")
-resultslabel = Label(bottomframe, textvariable=resultslabelstring, height=45, width = 60)
-resultslabel.pack(side = TOP)
+resultslabel = Label(nslookupframe, textvariable=resultslabelstring, height=45, width=60)
+resultslabel.pack(side=TOP)
+
+#########################################################################
+#The following function gets the hosts file loaded and ready to parse
+#then, we define a openFileButton
+
+#Declare a button, and give it as "command=blah" the function name you wish to call
+openFileButton = Button(openfileframe, text='Load', command=showhosts)
+
+#generate a geometric box around your object and place it
+openFileButton.pack(side=TOP)
+
 
 #########################################################
 #end of window layout
@@ -150,12 +253,13 @@ resultslabel.pack(side = TOP)
 
 #create a class to instantiate a command line, passing arguments to the object
 
-class commandline:
+
+class CommandLine:
     
-        ''' Parses a command list formatted thusly:
+        """ Parses a command list formatted thusly:
         ['ping', '-c', '4', 'ip address']
         for command line usage, parameterizes two
-        strings and standard output is string out, and err'''
+        strings and standard output is string out, and err"""
         
         #calling commandline with a command will return 2 vars:
         #self.out and self.err, the result of mapping stdout
@@ -165,7 +269,8 @@ class commandline:
             #Fist, let's pick up the arguments and define a method of using them
             self.args = args
             #next, let's spawn a process using self.args, and piping the IO
-            proc = subprocess.Popen(self.args, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=subprocess.SW_HIDE, shell=True)
+            proc = subprocess.Popen(self.args, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    creationflags=subprocess.SW_HIDE, shell=True)
             #finally, set self.out and self.error to stderr and stdout
             self.out, self.err = proc.communicate()
             
@@ -178,37 +283,41 @@ class commandline:
             #This is a trainwreck - it returns either error or result of checking
             return str(self.out)
 
+#Inherit from the commandline class, and use it to do an nslookup using the specified parameters
 
-class check(commandline):
+
+class Check(CommandLine):
     
-        ''' checks a host'''
+        """ checks a host"""
         
         def __init__(self, host, server):
             self.host = host
             self.server = server
         
         def __repr__(self):
-            self.out = commandline(['nslookup', self.host, self.server]).out
+            self.out = CommandLine(['nslookup', self.host, self.server]).out
             return self.out
         
         def __str__(self):
-            self.out = commandline(['nslookup', self.host, self.server]).out
+            self.out = CommandLine(['nslookup', self.host, self.server]).out
             return str(self.out)
             
+#Inherit from the commandline class, and use it to do a whois lookup using the specified parameters
 
-class whois(commandline):
+
+class Whois(CommandLine):
     
-        ''' checks a host'''
+        """ checks a host"""
         
         def __init__(self, host):
             self.host = host
         
         def __repr__(self):
-            self.out = commandline(['whois', '-v', self.host]).out
+            self.out = CommandLine(['whois', '-v', self.host]).out
             return self.out
         
         def __str__(self):
-            self.out = commandline(['whois', '-v', self.host]).out
+            self.out = CommandLine(['whois', '-v', self.host]).out
             return str(self.out)
             
 #class to take an ip or a range, and either do something useful, or iterate
@@ -220,7 +329,7 @@ class whois(commandline):
 ################################################################################
 
 
-class hostNameEnum:
+class HostNameEnum:
     #gets the host from a text input field
     def __init__(self):
         self.hostName = hostName.get()
@@ -230,8 +339,8 @@ class hostNameEnum:
         #would be shocked if this works at all right out of the gate:
         if len(string.split(self.hostName, sep=";")) > 1:
             for i in range(0, len(self.hostName)):
-                self.tempHost = string.split(str(self.hostName, sep=";")[i])
-                self.hostList.append(self.tempHost[i])
+                self.tempHost = string.split(str(self.hostName), sep=";")[1]
+                self.hostList.append(self.tempHost)
         else:
             self.hostList.append(self.hostName)
 
@@ -243,6 +352,31 @@ class hostNameEnum:
 
     def __getitem__(self, i):
         return str(self.hostList[i])
+
+#######################################################################
+#TODO: Finish Writing savewhoisresults function
+
+
+def lookupwhoiesults():
+    results = []
+    whoisResults.delete("1.0", END)
+    a = loadhosts()
+    for i in a:
+        time.sleep(12)
+        results.append(Whois(str.split(i)[0]))
+        #print results
+        whoisResults.insert(INSERT, results)
+    return results
+
+#########################################################################
+#The following function gets the hosts file loaded and ready to parse
+#then, we define a savewhoisresults button
+
+#Declare a button, and give it as "command=blah" the function name you wish to call
+whoisFileButton = Button(savefileframe, text='Whois', command=savewhoisresults)
+
+#generate a geometric box around your object and place it
+whoisFileButton.pack(side=TOP)
 
 
 #########################################################
