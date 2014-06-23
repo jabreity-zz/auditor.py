@@ -144,7 +144,7 @@ scrollbar.pack(side=RIGHT, fill=Y)
 
 #initialize a variable to hold the textbox entry, and bind the length of the scrollbar
 #to the length of the whois results frame
-whoisResults = Text(whoisframe, yscrollcommand=scrollbar.set)
+whoisResults = Text(whoisframe, yscrollcommand=scrollbar.set, height=25, width=70)
 whoisResults.pack(side=LEFT)
 
 ##############################################################
@@ -199,23 +199,32 @@ def showhosts():
 
 def checkhost(servername):
     a = HostNameEnum()
-    
+    results = []
     for i in a:
         #print(check(str(i)))
-        results = str(Check(str(i), servername))
-        if str(resultslabelstring.get()) == "empty":
-            resultslabelstring.set(results)
-        else:
-            resultslabelstring.set(resultslabelstring.get() + results)
+        results.append(Check(str(i), servername))
+    return results
+
+       # if str(resultslabelstring.get()) == "empty":
+       #     resultslabelstring.set(results)
+       # else:
+       #     resultslabelstring.set(resultslabelstring.get() + results)
+
 
 #Define the action for the button, including calling checkHost doing an nslookup,
 #and load whois into the scroll textbox at the right.
 
 
 def comparehost():
-    resultslabelstring.set("empty")
-    checkhost(str(referenceServerName.get()))
-    checkhost(str(targetServerName.get()))
+    resultslabel.delete("1.0", END)
+    #resultslabel.insert(INSERT, (checkhost(str(referenceServerName.get()))))
+    for i in checkhost(str(referenceServerName.get())):
+        resultslabel.insert(INSERT, i)
+    #resultslabel.insert(INSERT, (checkhost(str(targetServerName.get()))))
+    for i in checkhost(str(targetServerName.get())):
+        resultslabel.insert(INSERT, i)
+    #checkhost(str(referenceServerName.get()))
+    #checkhost(str(targetServerName.get()))
     #add the whois function call
     #whoisResults.insert(
     #print(whois(str(hostName.get())))
@@ -230,10 +239,16 @@ hostNameCheck = Button(frame, text='check', command=comparehost)
 #generate a geometric box around your object and place it
 hostNameCheck.pack(side=TOP)
 
+#############################################################
+#Add a fucking Scrollbar
+scrollbarnslookup = Scrollbar(nslookupframe)
+scrollbarnslookup.pack(side=RIGHT, fill=Y)
+
 #Declare a new label for the results
-resultslabelstring = StringVar()
-resultslabelstring.set("empty")
-resultslabel = Label(nslookupframe, textvariable=resultslabelstring, height=45, width=60)
+
+#resultslabelstring = StringVar()
+#resultslabelstring.set("empty")
+resultslabel = Text(nslookupframe, yscrollcommand=scrollbarnslookup.set, height=25, width=35)
 resultslabel.pack(side=TOP)
 
 #########################################################################
