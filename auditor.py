@@ -6,10 +6,16 @@ from Tkinter import *
 #from subprocess import call
 #from collections import defaultdict
 
-            #Requires whois by Mark Russinovich:
+#Requires whois by Mark Russinovich:
 #http://technet.microsoft.com/en-us/sysinternals/bb897435.aspx
 
-#using the documentation from:
+#Requires SQLcmd.exe aka SQL Server Command Line Tools version 11 by Microsoft:
+#http://www.microsoft.com/en-us/download/confirmation.aspx?id=36433
+
+#SQLcmd.exe requires Microsoft ODBC Driver 11 for SQL Server
+#http://www.microsoft.com/en-us/download/details.aspx?id=36434
+
+#using documentation on TK implementation from:
 #http://www.tutorialspoint.com/python/python_gui_programming.htm
 
 #########################################################
@@ -144,7 +150,7 @@ scrollbar.pack(side=RIGHT, fill=Y)
 
 #initialize a variable to hold the textbox entry, and bind the length of the scrollbar
 #to the length of the whois results frame
-whoisResults = Text(whoisframe, yscrollcommand=scrollbar.set, height=25, width=70)
+whoisResults = Text(whoisframe, yscrollcommand=scrollbar.set, height=25, width=80)
 whoisResults.pack(side=LEFT)
 
 ##############################################################

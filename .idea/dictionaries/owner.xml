@@ -11,8 +11,10 @@
       <w>checkopenfilehosts</w>
       <w>checkopenhosts</w>
       <w>comparehost</w>
+      <w>defaultdict</w>
       <w>hostlist</w>
       <w>hostnameenum</w>
+      <w>lcmd</w>
       <w>loadhosts</w>
       <w>loadopenfile</w>
       <w>loadwords</w>
@@ -23,6 +25,7 @@
       <w>noninfringement</w>
       <w>nslookup</w>
       <w>nslookupframe</w>
+      <w>odbc</w>
       <w>openfileframe</w>
       <w>parameterizes</w>
       <w>proc</w>
